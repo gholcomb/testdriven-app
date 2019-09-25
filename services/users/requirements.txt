@@ -1,1 +1,4 @@
 Flask==1.0.2
+FLASK-SQLAlchemy==2.4.0
+psycopg2==2.7.4
+Flask-Testing==0.7.1
