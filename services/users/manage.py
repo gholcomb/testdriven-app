@@ -3,12 +3,19 @@
 import unittest
 from flask.cli import FlaskGroup
 
-from project import app
+from project import create_app, db
+from project.api.models import User
 
-cli = FlaskGroup(app)
+app = create_app()
+cli = FlaskGroup(create_app=create_app)
 
 @cli.command()
+def recreate_db():
+    db.drop_all()
+    db.create_all()
+    db.session.commit()
 
+@cli.command()
 def test():
     """runs the tests without code coverage"""
     tests = unittest.TestLoader().discover('project/tests', pattern='test*.py')
@@ -18,11 +25,12 @@ def test():
     return 1
 
 
-
-def recreate_db():
-    db.drop_all()
-    db.create_all()
-    db.session_commit()
+@cli.command()
+def seed_db():
+    """Seeds the database"""
+    db.session.add(User(username='michael', email='michael@mherman.org'))
+    db.session.add(User(username='michaelherman', email='michael@mherman.org'))
+    db.session.commit()
 
 if __name__ == '__main__':
     cli()
