@@ -136,6 +136,24 @@ class TestUserService(BaseTestCase):
             self.assertIn('gholcomb@gmail.com', data['data']['users'][1]['email'])
             self.assertIn('success', data['status'])
 
+    def test_main_no_users(self):
+        """Ensure the amin route behaves correctly when no users have been added to the DB"""
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'All Users', response.data)
+        self.assertIn(b'<p>No users!</p>', response.data)
+
+    def test_main_with_users(self):
+        """Ensure the main route behaves correctly when users have been added to the DB"""
+        add_user('michael', 'michael@mherman.org')
+        add_user('griffin', 'gholcomb@gmail.com')
+        with self.client:
+            response = self.client.get('/')
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'All Users', response.data)
+            self.assertNotIn(b'<p>No users!</p>', response.data)
+            self.assertIn(b'michael', response.data)
+            self.assertIn(b'griffin', response.data)
 
 
 if __name__ == '__main__':
